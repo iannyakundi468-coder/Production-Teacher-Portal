@@ -37,6 +37,9 @@ export default function Classes() {
   const [isCommitting, setIsCommitting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [filterActive, setFilterActive] = useState(false);
+  const [showAddStudent, setShowAddStudent] = useState(false);
+  const [newStudent, setNewStudent] = useState({ name: '', email: '', password: 'demo', studentIdNumber: '' });
+  const [isAddingStudent, setIsAddingStudent] = useState(false);
 
   // Lesson Plan / Scheme of Work Generator State
   const [isGenerating, setIsGenerating] = useState(false);
@@ -112,6 +115,21 @@ export default function Classes() {
     }
   };
 
+  const handleAddStudentSubmit = async () => {
+    if (!newStudent.name || !newStudent.email || !newStudent.password) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+    setIsAddingStudent(true);
+    const success = await addStudent(selectedClass.id, newStudent);
+    setIsAddingStudent(false);
+    if (success) {
+      setShowAddStudent(false);
+      setNewStudent({ name: '', email: '', password: 'demo', studentIdNumber: '' });
+      alert('Student added and enrolled successfully!');
+    }
+  };
+
 
 
   const achievementLevels = [
@@ -149,7 +167,14 @@ export default function Classes() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-
+              {isHomeClass && (
+                <button 
+                  onClick={() => setShowAddStudent(true)}
+                  className="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded hover:bg-indigo-700 transition-all flex items-center gap-2"
+                >
+                  <Plus size={16} /> Add Student
+                </button>
+              )}
               <button 
                 onClick={handleExportData}
                 disabled={isExporting}
@@ -163,6 +188,44 @@ export default function Classes() {
         </div>
 
         {/* Add Student Modal-like form overlay */}
+        {showAddStudent && (
+          <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h3 className="font-bold text-slate-900">Add New Student</h3>
+                <button onClick={() => setShowAddStudent(false)} className="text-slate-400 hover:text-slate-600">
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Full Name</label>
+                  <input type="text" value={newStudent.name} onChange={e => setNewStudent({...newStudent, name: e.target.value})} className="w-full border border-slate-200 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="e.g. Emily Chen" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Email</label>
+                  <input type="email" value={newStudent.email} onChange={e => setNewStudent({...newStudent, email: e.target.value})} className="w-full border border-slate-200 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="emily@example.com" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Student ID Number</label>
+                  <input type="text" value={newStudent.studentIdNumber} onChange={e => setNewStudent({...newStudent, studentIdNumber: e.target.value})} className="w-full border border-slate-200 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="e.g. STU-005" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Password</label>
+                  <input type="text" value={newStudent.password} onChange={e => setNewStudent({...newStudent, password: e.target.value})} className="w-full border border-slate-200 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="demo" />
+                  <p className="text-[10px] text-slate-500 mt-1">Temporary password for the student portal</p>
+                </div>
+              </div>
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
+                <button onClick={() => setShowAddStudent(false)} className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded transition-colors" disabled={isAddingStudent}>Cancel</button>
+                <button onClick={handleAddStudentSubmit} disabled={isAddingStudent} className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded transition-colors flex items-center gap-2">
+                  {isAddingStudent ? <Zap size={14} className="animate-spin" /> : <Plus size={14} />} 
+                  {isAddingStudent ? 'Adding...' : 'Add & Enroll Student'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
 
         {/* Professional Tab Navigation */}

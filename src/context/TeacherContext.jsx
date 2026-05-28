@@ -83,15 +83,35 @@ export function TeacherProvider({ children }) {
     }));
   };
 
-  const addStudent = (classId, student) => {
-    setTeacherData(prev => ({
-      ...prev,
-      classes: prev.classes.map(c => 
-        c.id === classId 
-          ? { ...c, students: [...c.students, { ...student, id: `s-${Date.now()}`, portfolioCount: 0, cbcAssessments: { strands: [], competencies: {} }, attendance: { present: 0, total: 0 } }] }
-          : c
-      )
-    }));
+  const addStudent = async (classId, student) => {
+    try {
+      const response = await api.post(`/teacher/classes/${classId}/students`, student);
+      if (response.student) {
+        setTeacherData(prev => ({
+          ...prev,
+          classes: prev.classes.map(c => 
+            c.id === classId 
+              ? { 
+                  ...c, 
+                  students: [...c.students, { 
+                    ...student, 
+                    id: response.student.id, 
+                    portfolioCount: 0, 
+                    cbcAssessments: { strands: [], competencies: {} }, 
+                    attendance: { present: 0, total: 0 },
+                    status: 'active'
+                  }] 
+                }
+              : c
+          )
+        }));
+        return true;
+      }
+    } catch (err) {
+      console.error('Failed to add student:', err);
+      alert(err.message || 'Failed to add student');
+      return false;
+    }
   };
 
   const removeStudent = (classId, studentId) => {
