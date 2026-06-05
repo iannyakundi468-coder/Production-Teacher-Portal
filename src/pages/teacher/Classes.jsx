@@ -40,6 +40,11 @@ export default function Classes() {
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [newStudent, setNewStudent] = useState({ name: '', email: '', password: 'demo', studentIdNumber: '' });
   const [isAddingStudent, setIsAddingStudent] = useState(false);
+  
+  // Messaging state
+  const { sendMessage } = useTeacher();
+  const [messageModal, setMessageModal] = useState({ isOpen: false, student: null, subject: '', content: '' });
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
 
   // Lesson Plan / Scheme of Work Generator State
   const [isGenerating, setIsGenerating] = useState(false);
@@ -127,6 +132,20 @@ export default function Classes() {
       setShowAddStudent(false);
       setNewStudent({ name: '', email: '', password: 'demo', studentIdNumber: '' });
       alert('Student added and enrolled successfully!');
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!messageModal.subject || !messageModal.content) {
+      alert('Please fill in both subject and message content.');
+      return;
+    }
+    setIsSendingMessage(true);
+    const success = await sendMessage(messageModal.student.id, messageModal.subject, messageModal.content);
+    setIsSendingMessage(false);
+    if (success) {
+      setMessageModal({ isOpen: false, student: null, subject: '', content: '' });
+      alert('Message sent successfully!');
     }
   };
 
@@ -227,6 +246,38 @@ export default function Classes() {
           </div>
         )}
 
+        {/* Compose Message Modal */}
+        {messageModal.isOpen && (
+          <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h3 className="font-bold text-slate-900 flex items-center gap-2">
+                  <Mail size={18} className="text-indigo-600" /> Message {messageModal.student?.name}
+                </h3>
+                <button onClick={() => setMessageModal({ ...messageModal, isOpen: false })} className="text-slate-400 hover:text-slate-600">
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Subject</label>
+                  <input type="text" value={messageModal.subject} onChange={e => setMessageModal({...messageModal, subject: e.target.value})} className="w-full border border-slate-200 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="e.g. Excellent progress in Math" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Message Content</label>
+                  <textarea rows="5" value={messageModal.content} onChange={e => setMessageModal({...messageModal, content: e.target.value})} className="w-full border border-slate-200 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500 outline-none resize-none" placeholder="Write your message here..."></textarea>
+                </div>
+              </div>
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
+                <button onClick={() => setMessageModal({ ...messageModal, isOpen: false })} className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded transition-colors" disabled={isSendingMessage}>Cancel</button>
+                <button onClick={handleSendMessage} disabled={isSendingMessage} className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded transition-colors flex items-center gap-2">
+                  {isSendingMessage ? <Zap size={14} className="animate-spin" /> : <Mail size={14} />} 
+                  {isSendingMessage ? 'Sending...' : 'Send Message'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Professional Tab Navigation */}
         <div className="border-b border-slate-200 flex gap-8">
@@ -298,7 +349,8 @@ export default function Classes() {
                             <FileText size={14} /> Report Card
                           </button>
                           <button 
-                            onClick={() => alert(`Emailing ${student.name}... (Feature coming soon)`)}
+                            onClick={() => setMessageModal({ isOpen: true, student, subject: '', content: '' })}
+                            title="Send In-App Message"
                             className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-white border border-slate-100 rounded transition-colors"
                           >
                             <Mail size={16} />

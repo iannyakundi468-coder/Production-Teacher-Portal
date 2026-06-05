@@ -235,6 +235,21 @@ export function TeacherProvider({ children }) {
     }
   };
 
+  const sendMessage = async (receiverId, subject, content) => {
+    try {
+      await api.post('/teacher/messages', {
+        receiverId,
+        subject,
+        content
+      });
+      return true;
+    } catch (err) {
+      console.error('Failed to send message:', err);
+      alert(err.message || 'Failed to send message');
+      return false;
+    }
+  };
+
   return (
     <TeacherContext.Provider value={{
       teacherData,
@@ -250,6 +265,7 @@ export function TeacherProvider({ children }) {
       updateProfile,
       updateAssessmentLevel,
       updateAttendance,
+      sendMessage,
       refreshData: fetchTeacherData
     }}>
       {children}
