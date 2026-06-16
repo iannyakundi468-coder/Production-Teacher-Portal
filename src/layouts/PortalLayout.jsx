@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, User, LogOut, GraduationCap, BookOpen, Users, Menu, X, ChevronDown, Bell } from 'lucide-react';
+import { LayoutDashboard, User, LogOut, GraduationCap, BookOpen, Users, Menu, X, ChevronDown, Bell, Calendar } from 'lucide-react';
 import { ErrorBoundary } from '../components/common/ErrorBoundary';
 import { useTeacher } from '../context/TeacherContext';
 import ThemeCustomizer from '../components/ThemeCustomizer';
@@ -21,6 +21,7 @@ export default function PortalLayout() {
     { to: '/teacher', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/teacher/classes', label: 'My Classes', icon: Users },
     { to: '/teacher/portfolio', label: 'Portfolio Manager', icon: BookOpen },
+    { to: '/teacher/timetable', label: 'My Timetable', icon: Calendar },
     { to: '/teacher/profile', label: 'Settings', icon: User },
   ];
 

@@ -9,6 +9,7 @@ import TeacherDashboard from './pages/teacher/TeacherDashboard';
 import Classes from './pages/teacher/Classes';
 import TeacherPortfolio from './pages/teacher/TeacherPortfolio';
 import TeacherProfile from './pages/teacher/TeacherProfile';
+import Timetable from './pages/teacher/Timetable';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
             <Route path="classes" element={<Classes />} />
             <Route path="portfolio" element={<TeacherPortfolio />} />
             <Route path="profile" element={<TeacherProfile />} />
+            <Route path="timetable" element={<Timetable />} />
           </Route>
 
           {/* Catch-all redirect to login */}
